@@ -28,7 +28,7 @@ module.exports = {
   outputDir: 'relative path to generated api directory',
   presets: [
     [
-      'effector-openapi-preset',
+      '@redwert/effector-openapi-preset',
       {
         effectorImport: 'effector-root',
         requestName: 'fetchFx',

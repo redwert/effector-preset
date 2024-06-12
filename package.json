@@ -1,5 +1,5 @@
 {
-  "name": "effector-openapi-preset",
+  "name": "@redwert/effector-openapi-preset",
   "version": "0.3.3",
   "description": "Generate API layer from Swagger by openapi",
   "main": "index.js",
