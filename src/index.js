@@ -272,7 +272,11 @@ function createRequestParams(
 ) {
   const destructuring = detectDestructuring({ parameters, requestBody });
 
-  return t.objectExpression([
+  const isApplicationJson = requestBody?.content['application/json']
+    ? 'application/json'
+    : undefined;
+
+  const properties = [
     t.objectProperty(
       t.identifier('path'),
       createPath({ path }, { parameters }),
@@ -287,7 +291,23 @@ function createRequestParams(
       .map((name) =>
         t.objectProperty(t.identifier(name), t.identifier(name), false, true),
       ),
-  ]);
+  ];
+
+  if (isApplicationJson) {
+    properties.push(
+      t.objectProperty(
+        t.identifier('header'),
+        t.objectExpression([
+          t.objectProperty(
+            t.identifier(`'content-type'`),
+            t.stringLiteral('application/json'),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  return t.objectExpression(properties);
 }
 
 function createEffect(
