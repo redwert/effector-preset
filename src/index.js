@@ -3,11 +3,11 @@ const generate = require('@babel/generator').default;
 const template = require('@babel/template').default;
 const t = require('@babel/types');
 
-const { status } = require('./status');
-const { addComment } = require('./comments');
-const { createInterface } = require('./interfaces');
-const { createContract, createNullContract } = require('./contracts');
-const { stringPathToLiteral } = require('./path-literal');
+const {status} = require('./status');
+const {addComment} = require('./comments');
+const {createInterface} = require('./interfaces');
+const {createContract, createNullContract} = require('./contracts');
+const {stringPathToLiteral} = require('./path-literal');
 
 const exportConst = template(`export const %%name%% = %%value%%;`, {
   plugins: ['typescript'],
@@ -19,10 +19,10 @@ const handlerFunctionBody = template(
   const response = await %%requestFx%%(%%params%%);
   return %%statusParser%%;
 }`,
-  { allowAwaitOutsideFunction: true },
+  {allowAwaitOutsideFunction: true},
 );
 
-function contractGet({ contractName }) {
+function contractGet({contractName}) {
   return t.tsTypeReference(
     t.tsQualifiedName(t.identifier('typed'), t.identifier('Get')),
     t.tsTypeParameterInstantiation([
@@ -31,7 +31,7 @@ function contractGet({ contractName }) {
   );
 }
 
-function createTypeDoneVariant({ status, contractName }) {
+function createTypeDoneVariant({status, contractName}) {
   /**
    * status: 'ok';
    * answer: typed.Get<typeof registerRequestOk>;
@@ -43,7 +43,7 @@ function createTypeDoneVariant({ status, contractName }) {
     ),
     t.tsPropertySignature(
       t.identifier('answer'),
-      t.tsTypeAnnotation(contractGet({ contractName })),
+      t.tsTypeAnnotation(contractGet({contractName})),
     ),
   ]);
 }
@@ -55,7 +55,10 @@ function createDoneContracts(name, responses) {
     const contractName =
       changeCase.camelCase(name) + changeCase.pascalCase(status[code].code);
     const contract = responses[code].content
-      ? createContract(responses[code].content['application/json'].schema)
+      ? createContract(
+        responses[code].content['application/json']?.schema ||
+        responses[code].content['application/octet-stream']?.schema
+      )
       : createNullContract();
     const ast = t.exportNamedDeclaration(
       t.variableDeclaration('const', [
@@ -79,11 +82,14 @@ function createPropertyName(name) {
   return t.stringLiteral(name);
 }
 
-function createParamsTypes(name, { requestBody, parameters }) {
+function createParamsTypes(name, {requestBody, parameters}) {
   const members = [];
 
   if (requestBody) {
-    const schema = requestBody.content['application/json'].schema;
+    const schema =
+      requestBody.content['application/json']?.schema ||
+      requestBody.content['multipart/form-data'].schema;
+
     const member = t.tsPropertySignature(
       t.identifier('body'),
       t.tsTypeAnnotation(createInterface(schema)),
@@ -96,7 +102,7 @@ function createParamsTypes(name, { requestBody, parameters }) {
   const dataTypes = {};
   for (const parameter of parameters) {
     if (!dataTypes[parameter.in])
-      dataTypes[parameter.in] = { required: false, children: [] };
+      dataTypes[parameter.in] = {required: false, children: []};
 
     const passedType = dataTypes[parameter.in];
     passedType.required = passedType.required || parameter.required;
@@ -105,9 +111,9 @@ function createParamsTypes(name, { requestBody, parameters }) {
 
   // Convert list of parameters to property signature
   for (const name in dataTypes) {
-    const { required, children } = dataTypes[name];
+    const {required, children} = dataTypes[name];
     const schema = t.tsTypeLiteral(
-      children.map(({ name, required, schema, content, description }) => {
+      children.map(({name, required, schema, content, description}) => {
         const property = t.tsPropertySignature(
           createPropertyName(name),
           t.tsTypeAnnotation(
@@ -177,7 +183,7 @@ function createFailContracts(name, responses) {
   return contracts;
 }
 
-function createTypeFailVariant({ status, contractName }) {
+function createTypeFailVariant({status, contractName}) {
   /**
    * status: %%status%%;
    * error: typed.Get<typeof %%contractName%%>;
@@ -189,7 +195,7 @@ function createTypeFailVariant({ status, contractName }) {
     ),
     t.tsPropertySignature(
       t.identifier('error'),
-      t.tsTypeAnnotation(contractGet({ contractName })),
+      t.tsTypeAnnotation(contractGet({contractName})),
     ),
   ]);
 }
@@ -215,7 +221,7 @@ function createFail(name, responses) {
   );
 }
 
-function createPath({ path }, { parameters = [] }) {
+function createPath({path}, {parameters = []}) {
   const pathParameters = parameters.filter((param) => param.in === 'path');
   const literal = stringPathToLiteral(path);
   if (literal === null) return t.stringLiteral(path);
@@ -225,14 +231,14 @@ function createPath({ path }, { parameters = [] }) {
     if (!availableParameters.includes(name)) {
       console.warn(
         `Warning for "${path}": parameter "${name}" not found in parameters object\n` +
-          `Add { name: "${name}", in: "path" } to parameters object`,
+        `Add { name: "${name}", in: "path" } to parameters object`,
       );
     }
   });
 
   return t.templateLiteral(
     literal.quasis.map((raw, index) =>
-      t.templateElement({ raw }, index === literal.quasis.length - 1),
+      t.templateElement({raw}, index === literal.quasis.length - 1),
     ),
     literal.expressions.map((name) =>
       t.memberExpression(t.identifier('path'), t.identifier(name)),
@@ -240,22 +246,22 @@ function createPath({ path }, { parameters = [] }) {
   );
 }
 
-function detectDestructuring({ parameters, requestBody }) {
+function detectDestructuring({parameters, requestBody}) {
   const destructuring = {};
 
   if (requestBody) destructuring.body = true;
 
-  for (const { in: place } of parameters) {
+  for (const {in: place} of parameters) {
     destructuring[place] = true;
   }
   return destructuring;
 }
 
-function createHandlerParams({ parameters = [], requestBody }) {
+function createHandlerParams({parameters = [], requestBody}) {
   if (parameters.length === 0 && !requestBody) {
     return [];
   }
-  const destructuring = detectDestructuring({ parameters, requestBody });
+  const destructuring = detectDestructuring({parameters, requestBody});
 
   return [
     t.objectPattern(
@@ -267,10 +273,10 @@ function createHandlerParams({ parameters = [], requestBody }) {
 }
 
 function createRequestParams(
-  { method, path },
-  { parameters = [], requestBody },
+  {method, path},
+  {parameters = [], requestBody},
 ) {
-  const destructuring = detectDestructuring({ parameters, requestBody });
+  const destructuring = detectDestructuring({parameters, requestBody});
 
   const isApplicationJson = requestBody?.content['application/json']
     ? 'application/json'
@@ -279,7 +285,7 @@ function createRequestParams(
   const properties = [
     t.objectProperty(
       t.identifier('path'),
-      createPath({ path }, { parameters }),
+      createPath({path}, {parameters}),
     ),
     t.objectProperty(
       t.identifier('method'),
@@ -311,14 +317,14 @@ function createRequestParams(
 }
 
 function createEffect(
-  { name, path, method },
-  { description, requestBody, responses, parameters = [] },
-  { requestName } = {},
+  {name, path, method},
+  {description, requestBody, responses, parameters = []},
+  {requestName} = {},
 ) {
   const constName = changeCase.camelCase(name);
   const TypeName = changeCase.pascalCase(name);
 
-  const paramsTypes = createParamsTypes(name, { requestBody, parameters });
+  const paramsTypes = createParamsTypes(name, {requestBody, parameters});
 
   const doneContracts = createDoneContracts(name, responses);
   const failContracts = createFailContracts(name, responses);
@@ -354,12 +360,12 @@ function createEffect(
       t.objectMethod(
         'method',
         t.identifier('handler'),
-        createHandlerParams({ parameters, requestBody }),
+        createHandlerParams({parameters, requestBody}),
         handlerFunctionBody({
           name: t.stringLiteral(`${constName}.body`),
           params: createRequestParams(
-            { path, method },
-            { parameters, requestBody },
+            {path, method},
+            {parameters, requestBody},
           ),
           statusParser,
           requestFx: t.identifier(requestName),
@@ -401,8 +407,8 @@ function renderProgram(nodes) {
 function renderAst(ast) {
   return generate(ast, {
     plugins: ['typescript'],
-    jsescOption: { compact: false },
+    jsescOption: {compact: false},
   }).code;
 }
 
-module.exports = { createEffect, renderProgram, renderAst };
+module.exports = {createEffect, renderProgram, renderAst};
