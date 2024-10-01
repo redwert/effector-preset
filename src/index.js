@@ -362,7 +362,7 @@ function createEffect(
         t.identifier('handler'),
         createHandlerParams({parameters, requestBody}),
         handlerFunctionBody({
-          name: t.stringLiteral(`${constName}.body`),
+          name: t.stringLiteral(`${constName}Fx.body`),
           params: createRequestParams(
             {path, method},
             {parameters, requestBody},
@@ -383,7 +383,7 @@ function createEffect(
   ]);
 
   const expression = exportConst({
-    name: t.identifier(constName),
+    name: t.identifier(`${constName}Fx`),
     value: effectCall,
   });
   if (description) {
