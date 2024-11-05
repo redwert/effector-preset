@@ -321,6 +321,8 @@ function createEffect(
   {description, requestBody, responses, parameters = []},
   {requestName} = {},
 ) {
+  console.log(`Generating: ${name}`);
+
   const constName = changeCase.camelCase(name);
   const TypeName = changeCase.pascalCase(name);
 
