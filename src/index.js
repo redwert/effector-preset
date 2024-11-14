@@ -31,10 +31,25 @@ function contractGet({contractName}) {
   );
 }
 
-function createTypeDoneVariant({status, contractName}) {
+function excludeDeepVoid(type) {
+  return t.tsTypeReference(
+    t.identifier('ExcludeDeepVoid'),
+    t.tsTypeParameterInstantiation([type]),
+  );
+}
+
+function deepWritable(type) {
+  return t.tsTypeReference(
+    t.identifier('DeepWritable'),
+    t.tsTypeParameterInstantiation([type]),
+  );
+}
+
+function createTypeDoneVariant({ status, contractName }) {
   /**
    * status: 'ok';
-   * answer: typed.Get<typeof registerRequestOk>;
+   * answer: DeepWritable<ExcludeDeepVoid<typed.Get<typeof registerRequestOk>>>;
+   * headers: Record<string, string>;
    */
   return t.tsTypeLiteral([
     t.tsPropertySignature(
@@ -43,7 +58,21 @@ function createTypeDoneVariant({status, contractName}) {
     ),
     t.tsPropertySignature(
       t.identifier('answer'),
-      t.tsTypeAnnotation(contractGet({contractName})),
+      t.tsTypeAnnotation(
+        deepWritable(excludeDeepVoid(contractGet({ contractName }))),
+      ),
+    ),
+    t.tsPropertySignature(
+      t.identifier('headers'),
+      t.tsTypeAnnotation(
+        t.tsTypeReference(
+          t.identifier('Record'),
+          t.tsTypeParameterInstantiation([
+            t.tsStringKeyword(),
+            t.tsStringKeyword(),
+          ]),
+        ),
+      ),
     ),
   ]);
 }
