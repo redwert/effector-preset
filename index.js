@@ -28,6 +28,15 @@ export type GenericErrors =
     };
 
 type ErrorCodes = 400 | 401 | 402 | 403 | 404 | 405 | 406 | 500 | 501 | 502 | 503 | 504 | 505;
+
+type DeepWritable<T> = T extends object ? { -readonly [K in keyof T]: DeepWritable<T[K]> } : T;
+
+type ExcludeDeepVoid<Type> = Type extends object
+  ? {
+      [Key in keyof Type]: DeepWritable<ExcludeDeepVoid<Type[Key]>>
+    }
+  : Exclude<Type, void>;
+
 /**
  * @throws
  */
@@ -36,14 +45,14 @@ function parseByStatus<
   Contracts extends Record<number, [Variants, typed.Contract<any>]>,
   Result extends {
     [Code in keyof Contracts]: Contracts[Code] extends [infer Status, typed.Contract<infer T>]
-      ? { status: Status; answer: T }
+      ? { status: Status; answer: T, headers: Record<string, string> }
       : never;
   }
 >(
   name: string,
-  response: { status: number; body?: unknown },
+  response: { status: number; body?: unknown; headers: Record<string, string> },
   contracts: Contracts,
-): Result[Exclude<keyof Result, ErrorCodes>] {
+): DeepWritable<ExcludeDeepVoid<Result[Exclude<keyof Result, ErrorCodes>]>> {
   const contractObject = contracts[response.status];
   if (!contractObject) {
     throw {
@@ -62,7 +71,7 @@ function parseByStatus<
   if (response.status >= 400) {
     throw { status, error: answer };
   }
-  return { status, answer } as Result[Exclude<keyof Result, ErrorCodes>];
+  return { status, answer, headers: response.headers } as DeepWritable<ExcludeDeepVoid<Result[Exclude<keyof Result, ErrorCodes>]>>;
 }
 
 //#endregion prebuilt code
