@@ -72,16 +72,19 @@ function allOf(variants) {
 }
 
 function createContract(schema, required = true) {
-  if (schema.oneOf) return oneOf(schema.oneOf);
-  if (schema.anyOf) return anyOf(schema.anyOf);
-  if (schema.allOf) return allOf(schema.allOf);
+  let ast;
 
-  const creator = create[schema.type];
-  if (!creator) {
-    console.info(schema);
-    throw new Error(`type "${schema.type}" is not supported by contracts`);
+  if (schema.oneOf) ast = oneOf(schema.oneOf);
+  else if (schema.anyOf) ast = anyOf(schema.anyOf);
+  else if (schema.allOf) ast = allOf(schema.allOf);
+  else {
+    const creator = create[schema.type];
+    if (!creator) {
+      console.info(schema);
+      throw new Error(`type "${schema.type}" is not supported by contracts`);
+    }
+    ast = creator(schema);
   }
-  let ast = creator(schema);
 
   if (schema.nullable) {
     ast = t.memberExpression(ast, t.identifier('maybe'));

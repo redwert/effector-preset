@@ -204,10 +204,12 @@ test('render', () => {
     });
     export type RegisterConfirmationDone = {
       status: \\"ok\\";
-      answer: typed.Get<typeof registerConfirmationOk>;
+      answer: DeepWritable<ExcludeDeepVoid<typed.Get<typeof registerConfirmationOk>>>;
+      headers: Record<string, string>;
     } | {
       status: \\"accepted\\";
-      answer: typed.Get<typeof registerConfirmationAccepted>;
+      answer: DeepWritable<ExcludeDeepVoid<typed.Get<typeof registerConfirmationAccepted>>>;
+      headers: Record<string, string>;
     };
 
     /* Reset code or password is invalid */
@@ -231,7 +233,7 @@ test('render', () => {
     /* Send password recovery confirmation code to email
      * Add another example description
      * This is just a demo */
-    export const registerConfirmation = createEffect<RegisterConfirmation, RegisterConfirmationDone, RegisterConfirmationFail>({
+    export const registerConfirmationFx = createEffect<RegisterConfirmation, RegisterConfirmationDone, RegisterConfirmationFail>({
       async handler({
         body,
         path,
@@ -239,14 +241,17 @@ test('render', () => {
         header,
         cookie
       }) {
-        const name = \\"registerConfirmation.body\\";
+        const name = \\"registerConfirmationFx.body\\";
         const response = await requestFx({
           path: \`/register/\${path.first}/confirmation/\${path.second}\`,
           method: \\"POST\\",
           body,
           query,
           header,
-          cookie
+          cookie,
+          header: {
+            'content-type': \\"application/json\\"
+          }
         });
         return parseByStatus(name, response, {
           200: [\\"ok\\", registerConfirmationOk],

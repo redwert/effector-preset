@@ -201,6 +201,33 @@ test('allOf', () => {
   `);
 });
 
+test('nullable allOf', () => {
+  expect(
+    renderAst(
+      createContract({
+        nullable: true,
+        allOf: [
+          {
+            type: 'object',
+            required: ['foo', 'bar', 'baz'],
+            properties: {
+              foo: { type: 'string' },
+              bar: { type: 'string' },
+              baz: { type: 'string' },
+            },
+          },
+        ],
+      }),
+    ),
+  ).toMatchInlineSnapshot(`
+    "typed.intersection(typed.object({
+      foo: typed.string,
+      bar: typed.string,
+      baz: typed.string
+    })).maybe"
+  `);
+});
+
 test('anyOf', () => {
   expect(
     renderAst(
