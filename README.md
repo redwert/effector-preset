@@ -1,11 +1,11 @@
-# effector-openapi-preset
+# @redwert/effector-openapi-preset
 
 ## Usage
 
 #### Install openapi and preset
 
 ```shell
-yarn add -D openapi@^1.0.0 effector-openapi-preset
+yarn add -D @redwert/effector-openapi-preset
 ```
 
 #### Create config
