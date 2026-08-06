@@ -10,12 +10,22 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": ["index.js", "lib", "src", "!*.test.js"],
+  "files": [
+    "index.js",
+    "lib",
+    "src",
+    "!*.test.js"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/redwert/effector-preset.git"
   },
-  "keywords": ["swagger", "js", "openapi", "preset"],
+  "keywords": [
+    "swagger",
+    "js",
+    "openapi",
+    "preset"
+  ],
   "author": "Sergey Sova <mail@sergeysova.com> (https://sova.dev/)",
   "license": "MIT",
   "bugs": {

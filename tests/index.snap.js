@@ -26,7 +26,16 @@ export type GenericErrors =
       error: typed.ValidationError;
     };
 
-type ErrorCodes = 400 | 401 | 402 | 403 | 404 | 405 | 406 | 500 | 501 | 502 | 503 | 503 | 505;
+type ErrorCodes = 400 | 401 | 402 | 403 | 404 | 405 | 406 | 500 | 501 | 502 | 503 | 504 | 505;
+
+type DeepWritable<T> = T extends object ? { -readonly [K in keyof T]: DeepWritable<T[K]> } : T;
+
+type ExcludeDeepVoid<Type> = Type extends object
+  ? {
+      [Key in keyof Type]: DeepWritable<ExcludeDeepVoid<Type[Key]>>
+    }
+  : Exclude<Type, void>;
+
 /**
  * @throws
  */
@@ -35,14 +44,14 @@ function parseByStatus<
   Contracts extends Record<number, [Variants, typed.Contract<any>]>,
   Result extends {
     [Code in keyof Contracts]: Contracts[Code] extends [infer Status, typed.Contract<infer T>]
-      ? { status: Status; answer: T }
+      ? { status: Status; answer: T, headers: Record<string, string> }
       : never;
   }
 >(
   name: string,
-  response: { status: number; body?: unknown },
+  response: { status: number; body?: unknown; headers: Record<string, string> },
   contracts: Contracts,
-): Result[Exclude<keyof Result, ErrorCodes>] {
+): DeepWritable<ExcludeDeepVoid<Result[Exclude<keyof Result, ErrorCodes>]>> {
   const contractObject = contracts[response.status];
   if (!contractObject) {
     throw {
@@ -61,7 +70,7 @@ function parseByStatus<
   if (response.status >= 400) {
     throw { status, error: answer };
   }
-  return { status, answer } as Result[Exclude<keyof Result, ErrorCodes>];
+  return { status, answer, headers: response.headers } as DeepWritable<ExcludeDeepVoid<Result[Exclude<keyof Result, ErrorCodes>]>>;
 }
 
 //#endregion prebuilt code/* --- */
@@ -92,7 +101,8 @@ export const oauthTokenCreated = typed.object({
 });
 export type OauthTokenDone = {
   status: \\"created\\";
-  answer: typed.Get<typeof oauthTokenCreated>;
+  answer: DeepWritable<ExcludeDeepVoid<typed.Get<typeof oauthTokenCreated>>>;
+  headers: Record<string, string>;
 };
 
 /* When you can't exchange authorization code to access token */
@@ -111,15 +121,18 @@ export type OauthTokenFail = {
 } | GenericErrors;
 
 /* Exchange the authorization code for an access token */
-export const oauthToken = createEffect<OauthToken, OauthTokenDone, OauthTokenFail>({
+export const oauthTokenFx = createEffect<OauthToken, OauthTokenDone, OauthTokenFail>({
   async handler({
     body
   }) {
-    const name = \\"oauthToken.body\\";
+    const name = \\"oauthTokenFx.body\\";
     const response = await requestFx({
       path: \\"/oauth/token\\",
       method: \\"POST\\",
-      body
+      body,
+      header: {
+        'content-type': \\"application/json\\"
+      }
     });
     return parseByStatus(name, response, {
       201: [\\"created\\", oauthTokenCreated],
@@ -135,7 +148,7 @@ export const oauthToken = createEffect<OauthToken, OauthTokenDone, OauthTokenFai
 //#region viewerGet
 export type ViewerGet = {
   header: {
-    \\"X-Access-Token\\": string;
+    Authorization: string;
   };
 };
 
@@ -147,7 +160,8 @@ export const viewerGetOk = typed.object({
 });
 export type ViewerGetDone = {
   status: \\"ok\\";
-  answer: typed.Get<typeof viewerGetOk>;
+  answer: DeepWritable<ExcludeDeepVoid<typed.Get<typeof viewerGetOk>>>;
+  headers: Record<string, string>;
 };
 
 /* Failed to get profile of the user */
@@ -166,14 +180,14 @@ export type ViewerGetFail = {
 } | GenericErrors;
 
 /* Get info about viewer by access token */
-export const viewerGet = createEffect<ViewerGet, ViewerGetDone, ViewerGetFail>({
+export const viewerGetFx = createEffect<ViewerGet, ViewerGetDone, ViewerGetFail>({
   async handler({
     header
   }) {
-    const name = \\"viewerGet.body\\";
+    const name = \\"viewerGetFx.body\\";
     const response = await requestFx({
-      path: \\"/viewer\\",
-      method: \\"GET\\",
+      path: \\"/viewer.get\\",
+      method: \\"POST\\",
       header
     });
     return parseByStatus(name, response, {
