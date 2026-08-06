@@ -80,6 +80,7 @@ test('render', () => {
               },
             },
           ],
+
           requestBody: {
             required: true,
             content: {
@@ -167,69 +168,56 @@ test('render', () => {
         email: string;
       };
       path: {
-        /* Just a stub parameter */
-        first?: string;
-
-        /* This is a example */
-        second: number;
+        /* Just a stub parameter */first?: string;
+        /* This is a example */second: number;
       };
       query: {
-        /* ID of the object to fetch */
-        id?: string;
-
-        /* Algebra to use */
-        math: \\"hk86\\" | \\"hk84\\" | \\"dt14\\";
+        /* ID of the object to fetch */id?: string;
+        /* Algebra to use */math: "hk86" | "hk84" | "dt14";
       };
       header: {
-        /* Super authentication token */
-        \\"X-Token\\": string;
+        /* Super authentication token */"X-Token": string;
         Hello?: number;
       };
       cookie?: {
-        /* Theme of user interface */
-        theme?: \\"dark\\" | \\"light\\" | \\"auto\\";
+        /* Theme of user interface */theme?: "dark" | "light" | "auto";
         lastUpdated?: number;
       };
     };
-
     /* Password changed successfully */
     export const registerConfirmationOk = typed.nul;
-
     /* Reset code or password is invalid */
     export const registerConfirmationAccepted = typed.object({
       /* Send password recovery confirmation code to email
        * Add another example description
        * This is just a demo */
-      error: typed.union(\\"invalid_email\\", \\"invalid_password\\")
+      error: typed.union("invalid_email", "invalid_password")
     });
     export type RegisterConfirmationDone = {
-      status: \\"ok\\";
+      status: "ok";
       answer: DeepWritable<ExcludeDeepVoid<typed.Get<typeof registerConfirmationOk>>>;
       headers: Record<string, string>;
     } | {
-      status: \\"accepted\\";
+      status: "accepted";
       answer: DeepWritable<ExcludeDeepVoid<typed.Get<typeof registerConfirmationAccepted>>>;
       headers: Record<string, string>;
     };
-
     /* Reset code or password is invalid */
     export const registerConfirmationBadRequest = typed.object({
       /* Send password recovery confirmation code to email
        * Add another example description
        * This is just a demo */
-      error: typed.union(\\"invalid_email\\", \\"invalid_password\\")
+      error: typed.union("invalid_email", "invalid_password")
     });
-
     /* Something goes wrong */
     export const registerConfirmationInternalServerError = typed.nul;
     export type RegisterConfirmationFail = {
-      status: \\"bad_request\\";
+      status: "bad_request";
       error: typed.Get<typeof registerConfirmationBadRequest>;
     } | {
-      status: \\"internal_server_error\\";
+      status: "internal_server_error";
       error: typed.Get<typeof registerConfirmationInternalServerError>;
     } | GenericErrors;
-
     /* Send password recovery confirmation code to email
      * Add another example description
      * This is just a demo */
@@ -241,26 +229,25 @@ test('render', () => {
         header,
         cookie
       }) {
-        const name = \\"registerConfirmationFx.body\\";
+        const name = "registerConfirmationFx.body";
         const response = await requestFx({
           path: \`/register/\${path.first}/confirmation/\${path.second}\`,
-          method: \\"POST\\",
+          method: "POST",
           body,
           query,
           header,
           cookie,
           header: {
-            'content-type': \\"application/json\\"
+            'content-type': "application/json"
           }
         });
         return parseByStatus(name, response, {
-          200: [\\"ok\\", registerConfirmationOk],
-          202: [\\"accepted\\", registerConfirmationAccepted],
-          400: [\\"bad_request\\", registerConfirmationBadRequest],
-          500: [\\"internal_server_error\\", registerConfirmationInternalServerError]
+          200: ["ok", registerConfirmationOk],
+          202: ["accepted", registerConfirmationAccepted],
+          400: ["bad_request", registerConfirmationBadRequest],
+          500: ["internal_server_error", registerConfirmationInternalServerError]
         });
       }
-
     });"
   `);
 });

@@ -17,7 +17,7 @@ test('object', () => {
     ),
   ).toMatchInlineSnapshot(`
     "{
-      error: \\"invalid_email\\" | \\"invalid_password\\";
+      error: "invalid_email" | "invalid_password";
     }"
   `);
 });
@@ -56,15 +56,12 @@ test('nested objects', () => {
     ),
   ).toMatchInlineSnapshot(`
     "{
-      /* It is just one line */
-      foo: {
+      /* It is just one line */foo: {
         demo: string;
         foo?: number;
         bar?: boolean;
       };
-
-      /* It is just one line */
-      bar?: {
+      /* It is just one line */bar?: {
         /* It is just one line
          * multiline description */
         demo: string | null;
@@ -110,13 +107,12 @@ test('oneOf', () => {
     ),
   ).toMatchInlineSnapshot(`
     "{
-      error: \\"invalid_email\\" | \\"invalid_password\\";
+      error: "invalid_email" | "invalid_password";
     } | {
       foo: boolean;
-
       /* It is just one line
        * multiline description */
-      bar?: (\\"first\\" | \\"second\\" | \\"third\\")[];
+      bar?: ("first" | "second" | "third")[];
     }"
   `);
 });
@@ -158,13 +154,12 @@ test('allOf', () => {
     ),
   ).toMatchInlineSnapshot(`
     "{
-      error: \\"invalid_email\\" | \\"invalid_password\\";
+      error: "invalid_email" | "invalid_password";
     } & {
       foo: boolean;
-
       /* It is just one line
        * multiline description */
-      bar?: (\\"first\\" | \\"second\\" | \\"third\\")[];
+      bar?: ("first" | "second" | "third")[];
     }"
   `);
 });
@@ -206,13 +201,12 @@ test('anyOf', () => {
     ),
   ).toMatchInlineSnapshot(`
     "Partial<{
-      error: \\"invalid_email\\" | \\"invalid_password\\";
+      error: "invalid_email" | "invalid_password";
     }> & Partial<{
       foo: boolean;
-
       /* It is just one line
        * multiline description */
-      bar?: (\\"first\\" | \\"second\\" | \\"third\\")[];
+      bar?: ("first" | "second" | "third")[];
     }>"
   `);
 });
@@ -262,22 +256,19 @@ test('additionalProperties', () => {
     ),
   ).toMatchInlineSnapshot(`
     "{
-      /* It is just one line */
-      foo: {
+      /* It is just one line */foo: {
         demo: string;
         foo?: number;
         bar?: boolean;
       };
-
-      /* It is just one line */
-      bar?: {
+      /* It is just one line */bar?: {
         /* It is just one line
          * multiline description */
         demo: string | null;
         [key: string]: unknown;
       };
       [key: string]: {
-        type?: \\"value\\" | \\"container\\";
+        type?: "value" | "container";
         [key: string]: unknown;
       };
     }"

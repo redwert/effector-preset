@@ -1,0 +1,27 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["import", "unicorn", "jest"],
+  "env": {
+    "node": true,
+    "es2024": true
+  },
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "no-unused-vars": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["tests/**", "**/*.test.js"],
+      "env": {
+        "jest": true
+      },
+      "rules": {
+        "jest/valid-title": "off",
+        "jest/no-conditional-expect": "off"
+      }
+    }
+  ],
+  "ignorePatterns": ["node_modules", "example", "TEST_API", "coverage"]
+}

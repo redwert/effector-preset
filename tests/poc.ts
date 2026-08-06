@@ -71,7 +71,7 @@ export const accessRecoverySendEmailFx = createEffect<
   AccessRecoverySendEmailDone,
   AccessRecoverySendEmailFail
 >({
-  async handler(params) {
+  async handler(_params) {
     const name = 'accessRecoverySendEmail.body';
     const answer: any = {};
     switch (answer.status) {

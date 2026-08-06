@@ -1,31 +1,23 @@
 {
   "name": "@redwert/effector-openapi-preset",
-  "version": "0.3.9",
+  "version": "0.4.0",
   "description": "Generate API layer from Swagger by openapi",
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "example": "openapi --config ./example/.openapi.config.js && yarn prettier --write ./example && yarn eslint --fix ./example"
+    "lint": "oxlint",
+    "example": "openapi --config ./example/.openapi.config.js && yarn prettier --write ./example && oxlint --fix ./example",
+    "prepare": "husky"
   },
   "publishConfig": {
     "access": "public"
   },
-  "files": [
-    "index.js",
-    "lib",
-    "src",
-    "!*.test.js"
-  ],
+  "files": ["index.js", "lib", "src", "!*.test.js"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/redwert/effector-preset.git"
   },
-  "keywords": [
-    "swagger",
-    "js",
-    "openapi",
-    "preset"
-  ],
+  "keywords": ["swagger", "js", "openapi", "preset"],
   "author": "Sergey Sova <mail@sergeysova.com> (https://sova.dev/)",
   "license": "MIT",
   "bugs": {
@@ -33,30 +25,27 @@
   },
   "homepage": "https://github.com/redwert/effector-preset#readme",
   "devDependencies": {
-    "@eslint-kit/eslint-config-base": "^2.1.2",
-    "@eslint-kit/eslint-config-node": "^2.0.0",
-    "@eslint-kit/eslint-config-prettier": "^2.0.0",
-    "@eslint-kit/eslint-config-typescript": "^3.1.2",
-    "@types/jest": "^26.0.14",
-    "@typescript-eslint/parser": "^4.4.0",
-    "babel-eslint": "^10.1.0",
-    "effector": "^21.5.0",
-    "eslint": "^7.11.0",
-    "eslint-plugin-jest": "^24.1.0",
-    "husky": "^4.3.0",
-    "jest": "^26.6.3",
-    "jest-snapshot": "^26.6.2",
-    "lint-staged": "^10.4.0",
+    "@types/jest": "^30.0.0",
+    "effector": "^23.4.4",
+    "husky": "^9.1.7",
+    "jest": "^30.4.2",
+    "jest-snapshot": "^30.4.1",
+    "lint-staged": "^17.3.0",
     "openapi": "^1.0.1",
-    "prettier": "^2.1.2",
+    "oxlint": "^1.77.0",
+    "prettier": "^3.9.6",
     "typed-contracts": "^2.3.0",
-    "typescript": "^4.0.3"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@babel/core": "^7.12.9",
-    "@babel/generator": "^7.12.5",
-    "@babel/template": "^7.12.7",
-    "@babel/types": "^7.12.7",
-    "change-case": "^4.1.1"
+    "@babel/core": "^7.29.7",
+    "@babel/generator": "^7.29.8",
+    "@babel/template": "^7.29.7",
+    "@babel/types": "^7.29.8",
+    "change-case": "^4.1.2"
+  },
+  "allowScripts": {
+    "fsevents@2.3.3": true,
+    "unrs-resolver@1.12.2": true
   }
 }

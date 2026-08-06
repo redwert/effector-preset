@@ -17,7 +17,7 @@ test('object with enum', () => {
     ),
   ).toMatchInlineSnapshot(`
     "typed.object({
-      error: typed.union(\\"invalid_email\\", \\"invalid_password\\")
+      error: typed.union("invalid_email", "invalid_password")
     })"
   `);
 });
@@ -56,15 +56,12 @@ test('nested objects', () => {
     ),
   ).toMatchInlineSnapshot(`
     "typed.object({
-      /* It is just one line */
-      foo: typed.object({
+      /* It is just one line */foo: typed.object({
         demo: typed.string,
         foo: typed.number.optional,
         bar: typed.boolean.optional
       }),
-
-      /* It is just one line */
-      bar: typed.object({
+      /* It is just one line */bar: typed.object({
         /* It is just one line
          * multiline description */
         demo: typed.string.maybe
@@ -97,10 +94,9 @@ test('array with unions', () => {
   ).toMatchInlineSnapshot(`
     "typed.object({
       foo: typed.boolean,
-
       /* It is just one line
        * multiline description */
-      bar: typed.array(typed.union(\\"first\\", \\"second\\", \\"third\\")).optional
+      bar: typed.array(typed.union("first", "second", "third")).optional
     })"
   `);
 });
@@ -142,13 +138,12 @@ test('oneOf', () => {
     ),
   ).toMatchInlineSnapshot(`
     "typed.union(typed.object({
-      error: typed.union(\\"invalid_email\\", \\"invalid_password\\")
+      error: typed.union("invalid_email", "invalid_password")
     }), typed.object({
       foo: typed.boolean,
-
       /* It is just one line
        * multiline description */
-      bar: typed.array(typed.union(\\"first\\", \\"second\\", \\"third\\")).optional
+      bar: typed.array(typed.union("first", "second", "third")).optional
     }))"
   `);
 });
@@ -190,13 +185,12 @@ test('allOf', () => {
     ),
   ).toMatchInlineSnapshot(`
     "typed.intersection(typed.object({
-      error: typed.union(\\"invalid_email\\", \\"invalid_password\\")
+      error: typed.union("invalid_email", "invalid_password")
     }), typed.object({
       foo: typed.boolean,
-
       /* It is just one line
        * multiline description */
-      bar: typed.array(typed.union(\\"first\\", \\"second\\", \\"third\\")).optional
+      bar: typed.array(typed.union("first", "second", "third")).optional
     }))"
   `);
 });
@@ -265,13 +259,12 @@ test('anyOf', () => {
     ),
   ).toMatchInlineSnapshot(`
     "typed.union(typed.object({
-      error: typed.union(\\"invalid_email\\", \\"invalid_password\\")
+      error: typed.union("invalid_email", "invalid_password")
     }), typed.object({
       foo: typed.boolean,
-
       /* It is just one line
        * multiline description */
-      bar: typed.array(typed.union(\\"first\\", \\"second\\", \\"third\\")).optional
+      bar: typed.array(typed.union("first", "second", "third")).optional
     }))"
   `);
 });
@@ -325,15 +318,12 @@ test('additionalProperties', () => {
     ),
   ).toMatchInlineSnapshot(`
     "typed.object({
-      /* It is just one line */
-      foo: typed.object({
+      /* It is just one line */foo: typed.object({
         demo: typed.string,
         foo: typed.number.optional,
         bar: typed.boolean.optional
       }),
-
-      /* It is just one line */
-      bar: typed.object({
+      /* It is just one line */bar: typed.object({
         /* It is just one line
          * multiline description */
         demo: typed.string.maybe
